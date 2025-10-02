@@ -28,6 +28,11 @@ type Dictionary = {
   copyValue: string;
   flagForReview: string;
   confidence: string;
+  explanation: string;
+  sourcePresidio: string;
+  sourceLLM: string;
+  traceHeading: string;
+  traceEmpty: string;
   maskedOutputHeading: string;
   maskedOutputHelper: string;
   copyMasked: string;
@@ -98,6 +103,11 @@ const translations: Record<Locale, Dictionary> = {
     copyValue: "Kopyala değer",
     flagForReview: "İşaretle (review)",
     confidence: "Güven Skoru",
+    explanation: "Açıklama",
+    sourcePresidio: "Presidio",
+    sourceLLM: "LLM",
+    traceHeading: "Analiz İzleri",
+    traceEmpty: "Bu analiz için ek olay kaydı yok.",
     maskedOutputHeading: "Maskeleme Sonucu",
     maskedOutputHelper: "Maske uygulanmış metni kopyalayın veya dışa aktarın.",
     copyMasked: "Maske Metni Kopyala",
@@ -167,6 +177,11 @@ const translations: Record<Locale, Dictionary> = {
     copyValue: "Copy value",
     flagForReview: "Flag for review",
     confidence: "Confidence",
+    explanation: "Explanation",
+    sourcePresidio: "Presidio",
+    sourceLLM: "LLM",
+    traceHeading: "Analysis Trace",
+    traceEmpty: "No additional events captured for this run.",
     maskedOutputHeading: "Masked Output",
     maskedOutputHelper: "Copy or export the masked content.",
     copyMasked: "Copy Masked Text",

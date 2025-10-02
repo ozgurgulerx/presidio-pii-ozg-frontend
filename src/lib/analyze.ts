@@ -3,9 +3,11 @@ import type {
   Analysis,
   BackendAnalysis,
   BackendEntity,
+  BackendTrace,
   Finding,
   FindingType,
   RiskLevel,
+  TraceStep,
 } from "./types";
 
 const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL ?? "http://localhost:8000/analyze";
@@ -50,9 +52,22 @@ const confidenceToPercentage = (score: number) =>
 
 const weightForType = (type: FindingType) => weightMap[type] ?? 5;
 
+const toTrace = (events: BackendTrace[] | undefined): TraceStep[] =>
+  (events ?? []).map((event, index) => ({
+    stage: event.stage || `event-${index + 1}`,
+    detail: event.detail,
+    elapsedMs: Number(event.elapsed_ms?.toFixed?.(2) ?? event.elapsed_ms ?? 0),
+  }));
+
 const buildFindings = (entities: BackendEntity[]): Finding[] =>
   entities.map((entity, index) => {
     const type = mapEntityType(entity.type);
+    const source = entity.source === "llm" ? "llm" : "presidio";
+    const explanation =
+      entity.explanation ??
+      (source === "llm"
+        ? `LLM fallback predicted ${type}`
+        : `Presidio recognizer predicted ${type}`);
     return {
       id: `${type}-${index}-${Math.round(entity.score * 1000)}`,
       type,
@@ -60,6 +75,8 @@ const buildFindings = (entities: BackendEntity[]): Finding[] =>
       start: entity.start,
       end: entity.end,
       confidence: confidenceToPercentage(entity.score),
+      source,
+      explanation,
     };
   });
 
@@ -79,6 +96,7 @@ const toAnalysis = (payload: BackendAnalysis, source: string): Analysis => {
   const riskScore = riskScoreFromFindings(findings);
   const maskedText = computeMaskedText(source, findings, payload.redacted_text);
   const distinctTypes = new Set(findings.map((item) => item.type)).size;
+  const trace = toTrace(payload.trace);
 
   return {
     riskScore,
@@ -86,6 +104,7 @@ const toAnalysis = (payload: BackendAnalysis, source: string): Analysis => {
     findings,
     maskedText,
     distinctTypes,
+    trace,
   };
 };
 
@@ -128,6 +147,7 @@ export async function analyzeText(text: string): Promise<Analysis> {
       findings: [],
       maskedText: "",
       distinctTypes: 0,
+      trace: [],
     };
   }
 

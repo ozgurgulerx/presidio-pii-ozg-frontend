@@ -5,12 +5,21 @@ export type BackendEntity = {
   start: number;
   end: number;
   score: number;
+  source?: string;
+  explanation?: string;
 };
 
 export type BackendAnalysis = {
   entities: BackendEntity[];
   has_pii: boolean;
   redacted_text?: string | null;
+  trace?: BackendTrace[];
+};
+
+export type BackendTrace = {
+  stage: string;
+  detail: string;
+  elapsed_ms: number;
 };
 
 export type FindingType =
@@ -33,6 +42,8 @@ export type Finding = {
   start: number;
   end: number;
   confidence: number;
+  source: "presidio" | "llm";
+  explanation: string;
 };
 
 export type Analysis = {
@@ -41,4 +52,11 @@ export type Analysis = {
   findings: Finding[];
   maskedText: string;
   distinctTypes: number;
+  trace: TraceStep[];
+};
+
+export type TraceStep = {
+  stage: string;
+  detail: string;
+  elapsedMs: number;
 };

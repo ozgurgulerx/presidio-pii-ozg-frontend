@@ -697,6 +697,14 @@ export default function Home() {
                     {findingsForDisplay.map((finding) => {
                       const masked = maskedSet.has(finding.id);
                       const label = findingLabels[locale][finding.type];
+                      const sourceLabel =
+                        finding.source === "llm"
+                          ? dictionary.sourceLLM
+                          : dictionary.sourcePresidio;
+                      const sourceBadgeClass =
+                        finding.source === "llm"
+                          ? "bg-violet-500/10 text-violet-200 border border-violet-500/20"
+                          : "bg-emerald-500/10 text-emerald-200 border border-emerald-500/20";
                       return (
                         <li
                           key={finding.id}
@@ -716,6 +724,14 @@ export default function Home() {
                                 <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
                                   {dictionary.confidence}: {finding.confidence}%
                                 </span>
+                                <span
+                                  className={cn(
+                                    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
+                                    sourceBadgeClass,
+                                  )}
+                                >
+                                  {sourceLabel}
+                                </span>
                                 {flagged.has(finding.id) ? (
                                   <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2.5 py-1 text-xs text-amber-200">
                                     <ShieldAlert className="h-3 w-3" aria-hidden />
@@ -731,6 +747,12 @@ export default function Home() {
                                 finding={finding}
                                 masked={masked}
                               />
+                              <p className="text-xs text-slate-300">
+                                <span className="font-medium text-slate-200">
+                                  {dictionary.explanation}:
+                                </span>{" "}
+                                {finding.explanation}
+                              </p>
                             </div>
                             <div className="flex flex-col gap-2 text-xs">
                               <button
@@ -789,6 +811,41 @@ export default function Home() {
                       );
                     })}
                   </ul>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-white/10 bg-[#0F1F2A] p-6 shadow-xl">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-semibold text-slate-100">
+                    {dictionary.traceHeading}
+                  </h2>
+                  <span className="text-xs text-slate-400">
+                    {analysis.trace.length}
+                  </span>
+                </div>
+                {analysis.trace.length === 0 ? (
+                  <div className="mt-6 rounded-xl border border-white/10 bg-[#0B1B2B] px-4 py-8 text-center text-sm text-slate-300">
+                    {dictionary.traceEmpty}
+                  </div>
+                ) : (
+                  <ol className="mt-6 space-y-4 text-sm text-slate-200">
+                    {analysis.trace.map((event, idx) => (
+                      <li
+                        key={`${event.stage}-${idx}`}
+                        className="rounded-lg border border-white/10 bg-[#0F2236]/80 p-4"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="font-medium text-slate-100">
+                            {event.stage}
+                          </div>
+                          <span className="text-xs text-slate-400">
+                            {event.elapsedMs.toFixed(2)} ms
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs text-slate-300">{event.detail}</p>
+                      </li>
+                    ))}
+                  </ol>
                 )}
               </div>
 
