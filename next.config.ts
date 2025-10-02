@@ -3,12 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable static export for Azure Static Web Apps
   output: "export",
-  // Azure Static Web Apps expects output in 'out' directory
-  distDir: "out",
   // Disable image optimization for static export
   images: {
     unoptimized: true,
   },
+  // Ensure trailing slashes for proper routing
+  trailingSlash: true,
 };
 
 export default nextConfig;
