@@ -53,6 +53,7 @@ export type Analysis = {
   maskedText: string;
   distinctTypes: number;
   trace: TraceStep[];
+  credentialAlert: boolean;
 };
 
 export type TraceStep = {

@@ -123,12 +123,23 @@ export default function Home() {
   const resultsRef = useRef<HTMLDivElement | null>(null);
   const idleRef = useRef<number>(Date.now());
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
-
-  if (!sessionIdRef.current && typeof window !== "undefined") {
-    sessionIdRef.current = crypto.randomUUID();
-  }
-  const sessionId = sessionIdRef.current ?? "SESSION";
+  // Generate a stable session id only on the client to avoid SSR/CSR mismatch.
+  const [sessionId, setSessionId] = useState<string>("");
+  useEffect(() => {
+    try {
+      const key = "pii-session-id";
+      let sid = sessionStorage.getItem(key);
+      if (!sid) {
+        sid = (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function")
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
+        sessionStorage.setItem(key, sid);
+      }
+      setSessionId(sid);
+    } catch {
+      // If storage is unavailable, leave empty; UI will render a placeholder.
+    }
+  }, []);
 
   // Decide which findings should be masked based on privacy mode and manual overrides.
   const maskedSet = useMemo(() => {
@@ -651,6 +662,11 @@ export default function Home() {
                       </span>
                     </div>
                     <p className="text-sm text-slate-300">{recommendation}</p>
+                    {analysis.credentialAlert ? (
+                      <div className="mt-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
+                        {dictionary.credentialAlert}
+                      </div>
+                    ) : null}
                   </div>
                   <div className="flex gap-6 text-sm text-slate-200">
                     <Metric
@@ -911,7 +927,7 @@ export default function Home() {
           </div>
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
             <span>
-              {dictionary.sessionId}: <span className="text-slate-200">{sessionId}</span>
+              {dictionary.sessionId}: <span className="text-slate-200" suppressHydrationWarning>{sessionId || "-"}</span>
             </span>
             <span>
               {dictionary.timestamp}: <span className="text-slate-200">{analysisTimestamp ? analysisTimestamp.toLocaleString(localeTag) : "-"}</span>
@@ -941,7 +957,7 @@ export default function Home() {
               <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden />
               {dictionary.statusOperational}
             </span>
-            <span className="text-slate-500">v1.0.0 · build {sessionId.slice(0, 8)}</span>
+            <span className="text-slate-500">v1.0.0 · build {sessionId ? sessionId.slice(0, 8) : "-"}</span>
           </div>
         </div>
       </footer>

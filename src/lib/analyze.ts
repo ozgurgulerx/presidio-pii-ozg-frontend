@@ -38,6 +38,12 @@ const weightMap: Record<FindingType, number> = {
   Other: 5,
 };
 
+const CRITICAL_TYPES: ReadonlySet<FindingType> = new Set([
+  "CreditCard",
+  "IBAN",
+  "NationalID",
+]);
+
 const riskFromScore = (score: number): RiskLevel => {
   if (score >= 65) return "high";
   if (score >= 25) return "medium";
@@ -80,8 +86,11 @@ const buildFindings = (entities: BackendEntity[]): Finding[] =>
     };
   });
 
-const riskScoreFromFindings = (findings: Finding[]) =>
-  Math.min(100, findings.reduce((acc, item) => acc + weightForType(item.type), 0));
+const riskScoreFromFindings = (findings: Finding[], credentialAlert: boolean) => {
+  if (credentialAlert) return 100;
+  if (findings.some((item) => CRITICAL_TYPES.has(item.type))) return 100;
+  return Math.min(100, findings.reduce((acc, item) => acc + weightForType(item.type), 0));
+};
 
 const computeMaskedText = (source: string, findings: Finding[], fallback?: string | null) => {
   if (fallback && fallback.length > 0) {
@@ -93,10 +102,11 @@ const computeMaskedText = (source: string, findings: Finding[], fallback?: strin
 
 const toAnalysis = (payload: BackendAnalysis, source: string): Analysis => {
   const findings = buildFindings(payload.entities);
-  const riskScore = riskScoreFromFindings(findings);
+  const trace = toTrace(payload.trace);
+  const credentialAlert = trace.some((event) => event.stage === "credential_alert");
+  const riskScore = riskScoreFromFindings(findings, credentialAlert);
   const maskedText = computeMaskedText(source, findings, payload.redacted_text);
   const distinctTypes = new Set(findings.map((item) => item.type)).size;
-  const trace = toTrace(payload.trace);
 
   return {
     riskScore,
@@ -105,6 +115,7 @@ const toAnalysis = (payload: BackendAnalysis, source: string): Analysis => {
     maskedText,
     distinctTypes,
     trace,
+    credentialAlert,
   };
 };
 
@@ -148,6 +159,7 @@ export async function analyzeText(text: string): Promise<Analysis> {
       maskedText: "",
       distinctTypes: 0,
       trace: [],
+      credentialAlert: false,
     };
   }
 

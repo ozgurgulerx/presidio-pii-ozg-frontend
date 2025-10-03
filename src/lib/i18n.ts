@@ -33,6 +33,7 @@ type Dictionary = {
   sourceLLM: string;
   traceHeading: string;
   traceEmpty: string;
+  credentialAlert: string;
   maskedOutputHeading: string;
   maskedOutputHelper: string;
   copyMasked: string;
@@ -108,6 +109,7 @@ const translations: Record<Locale, Dictionary> = {
     sourceLLM: "LLM",
     traceHeading: "Analiz İzleri",
     traceEmpty: "Bu analiz için ek olay kaydı yok.",
+    credentialAlert: "Bankacılık ya da giriş bilgileri içeriyor. Dikkatle inceleyin.",
     maskedOutputHeading: "Maskeleme Sonucu",
     maskedOutputHelper: "Maske uygulanmış metni kopyalayın veya dışa aktarın.",
     copyMasked: "Maske Metni Kopyala",
@@ -182,6 +184,7 @@ const translations: Record<Locale, Dictionary> = {
     sourceLLM: "LLM",
     traceHeading: "Analysis Trace",
     traceEmpty: "No additional events captured for this run.",
+    credentialAlert: "Contains banking or login credentials. Review immediately.",
     maskedOutputHeading: "Masked Output",
     maskedOutputHelper: "Copy or export the masked content.",
     copyMasked: "Copy Masked Text",

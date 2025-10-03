@@ -1,0 +1,14 @@
+
+> presidio-pii-ozg-frontend@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use by process 69599, using available port 3001 instead.
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.1.51:3001
+
+ ✓ Starting...
+ ✓ Ready in 810ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.3s
+ HEAD / 200 in 2583ms
