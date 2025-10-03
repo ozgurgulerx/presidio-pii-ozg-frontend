@@ -11,7 +11,7 @@ import type {
 } from "./types";
 
 const ANALYZE_URL = process.env.NEXT_PUBLIC_ANALYZE_URL ?? "http://localhost:8000/analyze";
-const REQUEST_TIMEOUT_MS = 15_000;
+const REQUEST_TIMEOUT_MS = 30_000;
 
 const entityTypeMap: Record<string, FindingType> = {
   PERSON: "Name",
