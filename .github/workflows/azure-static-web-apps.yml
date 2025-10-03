@@ -33,7 +33,7 @@ jobs:
       - name: Build project
         run: yarn build
         env:
-          NEXT_PUBLIC_ANALYZE_URL: ${{ secrets.NEXT_PUBLIC_ANALYZE_URL }}
+          NEXT_PUBLIC_ANALYZE_URL: ${{ secrets.NEXT_PUBLIC_ANALYZE_URL || vars.NEXT_PUBLIC_ANALYZE_URL }}
 
       - name: Build And Deploy
         uses: Azure/static-web-apps-deploy@v1
